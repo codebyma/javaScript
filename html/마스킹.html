@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마스킹</title>
+    <script type="text/javascript" src="../js/common.js"> </script>
+    <link type="text/css" rel="stylesheet" href="../css/common.css">
+</head>
+
+<body>
+    <div class="guide">
+        <h1 class="guide__header">마스킹</h1>
+
+        <div class="guide__view">
+            <div class="guide__view-title">결과</div>
+            <div id="getTodayDate" class="guide__view-text"></div>
+        </div>
+
+        <div class="guide__btn-wrap">
+            <div class="guide__btn-title">전체 마스킹</div>
+            <button type="button" data-fn-target="getTodayDate" class="guide__btn">
+                maskStringAdvanced('#010ABcd5*678', 2, 2, '*', true)
+            </button>
+        </div>
+        <div class="guide__btn-wrap">
+            <div class="guide__btn-title">숫자만 마스킹</div>
+            <button type="button" data-fn-target="getTodayDate" class="guide__btn">
+                maskStringAdvanced('#010ABcd5*678', 2, 2, '*', false)
+            </button>
+        </div>
+        <div class="guide__btn-wrap">
+            <div class="guide__btn-title">마스킹 문자 변경</div>
+            <button type="button" data-fn-target="getTodayDate" class="guide__btn">
+                maskStringAdvanced('#010ABcd5*678', 2, 2, '#', false)
+            </button>
+        </div>
+        <div class="guide__btn-wrap">
+            <div class="guide__btn-title">혼합 문자열</div>
+            <button type="button" data-fn-target="getTodayDate" class="guide__btn">
+                maskStringAdvanced('홍길동-010-1234', 2, 2, '*', true)
+            </button>
+        </div>
+    </div>
+
+    <script>
+        /**
+            * 문자열 마스킹 처리 함수
+            *
+            * @description
+            * 입력 문자열에서 특정 구간을 제외하고 문자를 마스킹 처리한다.
+            * - maskAll=true: 숫자, 영문, 한글 모두 마스킹 대상
+            * - maskAll=false: 숫자만 마스킹 대상
+            * - 특수문자는 항상 그대로 유지됨
+            *
+            * @param {string|number} input - 마스킹할 원본 값
+            * @param {number} [visibleStart=0] - 앞에서부터 노출할 문자 개수 (마스킹 대상 기준)
+            * @param {number} [visibleEnd=0] - 뒤에서부터 노출할 문자 개수 (마스킹 대상 기준)
+            * @param {string} [maskChar='*'] - 마스킹에 사용할 문자
+            * @param {boolean} [maskAll=false] - 전체 문자 마스킹 여부 (true: 전체 / false: 숫자만)
+            *
+            * @returns {string} 마스킹 처리된 문자열
+        */
+        function maskStringAdvanced(
+            input,
+            visibleStart = 0,
+            visibleEnd = 0,
+            maskChar = '*',
+            maskAll = false
+        ) {
+            const str = String(input);
+
+            // 방어 코드
+            visibleStart = Math.max(0, visibleStart);
+            visibleEnd = Math.max(0, visibleEnd);
+
+            // 마스킹 문자 1글자 제한
+            const mask = String(maskChar).charAt(0);
+
+            // 정규식 미리 정의 (성능 + 가독성)
+            const regAll = /[a-zA-Z0-9가-힣]/;
+            const regNum = /\d/;
+
+            // 마스킹 대상 총 개수 계산
+            let totalTarget = 0;
+            for (const char of str) {
+                if (maskAll ? regAll.test(char) : regNum.test(char)) {
+                    totalTarget++;
+                }
+            }
+
+            // 마스킹 필요 없음
+            if (visibleStart + visibleEnd >= totalTarget) return str;
+
+            let count = 0;
+            const endVisibleStart = totalTarget - visibleEnd;
+
+            let result = '';
+
+            for (const char of str) {
+                const isTarget = maskAll ? regAll.test(char) : regNum.test(char);
+
+                if (isTarget) {
+                    count++;
+
+                    if (count <= visibleStart || count > endVisibleStart) {
+                        result += char;
+                    } else {
+                        result += mask;
+                    }
+                } else {
+                    result += char;
+                }
+            }
+
+            return result;
+        }
+    </script>
+
+</body>
+
+</html>

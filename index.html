@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>인덱스</title>
+    <script type="text/javascript" src="./js/common.js"> </script>
+    <link type="text/css" rel="stylesheet" href="./css/common.css">
+
+</head>
+
+<body>
+    <div class="guide">
+        <div class="guide__index">
+            <div class="buide__index-top">
+                <div class="guide__header">페이지 선택</div>
+                <div class="guide__select-wrap">
+                    <!-- 1뎁스 -->
+                    <select id="level1" class="guide__select">
+                        <option value="">-- 대분류 선택 --</option>
+                        <option value="category1">Filter</option>
+                        <option value="category2">카테고리 2</option>
+                    </select>
+
+                    <!-- 2뎁스 -->
+                    <select id="level2" class="guide__select">
+                        <option value="">-- 소분류 선택 --</option>
+                    </select>
+                </div>
+            </div>
+            <div class="buide__index-bottom">
+                <iframe id="contentFrame"></iframe>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        const level1 = document.getElementById('level1');
+        const level2 = document.getElementById('level2');
+        const iframe = document.getElementById('contentFrame');
+
+        // 1뎁스에 따른 2뎁스 옵션 정의
+        const options = {
+            category1: [
+                { text: "현재 날짜 & 시간", value: "./html/현재_날짜_시간.html" },
+                { text: "통화 증가 감소", value: "./html/통화_증가_감소.html" },
+                { text: "마스킹", value: "./html/마스킹.html" },
+                { text: "페이지 1-2", value: "page1-2.html" }
+            ],
+            category2: [
+                { text: "페이지 2-1", value: "page2-1.html" },
+                { text: "페이지 2-2", value: "page2-2.html" }
+            ]
+        };
+
+        // 1뎁스 변경 시 2뎁스 옵션 업데이트
+        level1.addEventListener('change', () => {
+            const selected = level1.value;
+
+            // 기존 옵션 삭제
+            level2.innerHTML = '<option value="">-- 소분류 선택 --</option>';
+
+            if (selected && options[selected]) {
+                options[selected].forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt.value;
+                    option.textContent = opt.text;
+                    level2.appendChild(option);
+                });
+            }
+
+            // iframe 초기화
+            iframe.src = '';
+        });
+
+        // 2뎁스 선택 시 iframe에 페이지 로드
+        level2.addEventListener('change', () => {
+            const page = level2.value;
+            iframe.src = page || '';
+        });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>날짜 & 시간 예제</title>
+    <script type="text/javascript" src="../js/common.js"> </script>
+    <link type="text/css" rel="stylesheet" href="../css/common.css">
+</head>
+
+<body>
+    <div class="guide">
+        <h1 class="guide__header">현재 날짜 & 시간</h1>
+
+        <div class="guide__view">
+            <div class="guide__view-title">결과</div>
+            <div id="getTodayDate" class="guide__view-text"></div>
+        </div>
+
+        <div class="guide__btn-wrap">
+            <div class="guide__btn-title">현재 날짜</div>
+            <button type="button" data-fn-target="getTodayDate" class="guide__btn">getTodayDate()</button>
+        </div>
+        <div class="guide__btn-wrap">
+            <div class="guide__btn-title">현재 시간</div>
+            <button type="button" data-fn-target="getTodayDate" class="guide__btn">getCurrentTime()</button>
+        </div>
+        <div class="guide__btn-wrap">
+            <div class="guide__btn-title">현재 날짜+시간</div>
+            <button type="button" data-fn-target="getTodayDate" class="guide__btn">getDateTime()</button>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * 숫자를 2자리로 패딩
+         *
+         * @param {number} num
+         * @returns {string}
+         */
+        function pad2(num) {
+            return String(num).padStart(2, '0');
+        }
+
+        /**
+         * 날짜 포맷 반환 (YYYY.MM.DD)
+         *
+         * @param {Date} [date=new Date()] - 기준 날짜
+         * @returns {string}
+         *
+         * @example
+         * getTodayDate() // "2026.05.06"
+         */
+        function getTodayDate(date = new Date()) {
+            const year = date.getFullYear();
+            const month = pad2(date.getMonth() + 1);
+            const day = pad2(date.getDate());
+
+            return `${year}.${month}.${day}`;
+        }
+
+        /**
+         * 시간 포맷 반환 (HH:mm:ss)
+         *
+         * @param {Date} [date=new Date()] - 기준 시간
+         * @returns {string}
+         *
+         * @example
+         * getCurrentTime() // "14:03:09"
+         */
+        function getCurrentTime(date = new Date()) {
+            const hours = pad2(date.getHours());
+            const minutes = pad2(date.getMinutes());
+            const seconds = pad2(date.getSeconds());
+
+            return `${hours}:${minutes}:${seconds}`;
+        }
+
+        /**
+         * 날짜 + 시간 포맷 반환 (YYYY.MM.DD HH:mm:ss)
+         *
+         * @param {Date} [date=new Date()]
+         * @returns {string}
+         *
+         * @example
+         * getDateTime() // "2026.05.06 14:03:09"
+         */
+        function getDateTime(date = new Date()) {
+            /**
+             * 👉 Date 객체를 한 번만 생성해서 전달
+             * (기존: 함수마다 new Date() 호출 → 미세하지만 불필요한 비용)
+             */
+            return `${getTodayDate(date)} ${getCurrentTime(date)}`;
+        }
+    </script>
+
+</body>
+
+</html>
