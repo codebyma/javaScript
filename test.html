@@ -47,6 +47,10 @@
         #completeLottie {
             display: none;
         }
+
+        #touchBtn {
+            position: absolute;
+        }
     </style>
 </head>
 
@@ -64,6 +68,7 @@
         </div>
 
     </div>
+    <button type="button" id="touchBtn">touchBtn</button>
 
     <script>
 
@@ -101,6 +106,7 @@
         });
 
         const touchArea = document.getElementById('touchArea');
+        const touchBtn = document.getElementById('touchBtn');
 
         const loadingEl = document.getElementById('loadingLottie');
         const holdEl = document.getElementById('holdLottie');
@@ -239,19 +245,19 @@
         /*
             모바일 앱용 이벤트
         */
-        touchArea.addEventListener(
+        touchBtn.addEventListener(
             'touchstart',
             startHolding,
             { passive: false }
         );
 
-        touchArea.addEventListener(
+        touchBtn.addEventListener(
             'touchend',
             stopHolding,
             { passive: false }
         );
 
-        touchArea.addEventListener(
+        touchBtn.addEventListener(
             'touchcancel',
             stopHolding,
             { passive: false }
@@ -260,7 +266,7 @@
         /*
             iOS 롱탭 메뉴 방지
         */
-        touchArea.addEventListener('contextmenu', (e) => {
+        touchBtn.addEventListener('contextmenu', (e) => {
             e.preventDefault();
         });
 
