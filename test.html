@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Lottie Hold Interaction</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100vh;
+            background: #111;
+        }
+
+        .lottie-wrap {
+            position: relative;
+            width: 240px;
+            height: 240px;
+
+            touch-action: none;
+
+            -webkit-user-select: none;
+            user-select: none;
+
+            -webkit-touch-callout: none;
+        }
+
+        .lottie-item {
+            position: absolute;
+            inset: 0;
+        }
+
+        #holdLottie,
+        #completeLottie {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="lottie-wrap" id="touchArea">
+
+        <div id="loadingLottie" class="lottie-item">
+        </div>
+
+        <div id="holdLottie" class="lottie-item">
+        </div>
+
+        <div id="completeLottie" class="lottie-item">
+        </div>
+
+    </div>
+
+    <script>
+
+        /*
+            초기 로딩 로띠
+        */
+        const loading = lottie.loadAnimation({
+            container: document.getElementById('loadingLottie'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: 'https://assets9.lottiefiles.com/packages/lf20_usmfx6bp.json'
+        });
+
+        /*
+            누르고 있는 동안 재생되는 로띠
+        */
+        const hold = lottie.loadAnimation({
+            container: document.getElementById('holdLottie'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: false,
+            path: 'https://assets10.lottiefiles.com/packages/lf20_x62chJ.json'
+        });
+
+        /*
+            3초 완료 시 재생되는 로띠
+        */
+        const complete = lottie.loadAnimation({
+            container: document.getElementById('completeLottie'),
+            renderer: 'svg',
+            loop: false,
+            autoplay: false,
+            path: 'https://assets1.lottiefiles.com/packages/lf20_jbrw3hcz.json'
+        });
+
+        const touchArea = document.getElementById('touchArea');
+
+        const loadingEl = document.getElementById('loadingLottie');
+        const holdEl = document.getElementById('holdLottie');
+        const completeEl = document.getElementById('completeLottie');
+
+        let pressTimer = null;
+
+        let isHolding = false;
+        let isCompleted = false;
+
+        /*
+            완료 후 재실행 방지
+        */
+        let isFinished = false;
+
+        /*
+            초기 상태
+        */
+        showLoading();
+
+        /*
+            로딩 상태
+        */
+        function showLoading() {
+
+            loadingEl.style.display = 'block';
+            holdEl.style.display = 'none';
+            completeEl.style.display = 'none';
+
+            loading.play();
+
+            hold.pause();
+            complete.stop();
+        }
+
+        /*
+            홀드 상태
+        */
+        function showHolding() {
+
+            loadingEl.style.display = 'none';
+            holdEl.style.display = 'block';
+            completeEl.style.display = 'none';
+
+            loading.pause();
+
+            hold.goToAndPlay(0, true);
+        }
+
+        /*
+            완료 상태
+        */
+        function showComplete() {
+
+            loadingEl.style.display = 'none';
+            holdEl.style.display = 'none';
+            completeEl.style.display = 'block';
+
+            hold.pause();
+
+            complete.goToAndPlay(0, true);
+        }
+
+        /*
+            터치 시작
+        */
+        function startHolding(e) {
+
+            e.preventDefault();
+
+            /*
+                완료 이후 재실행 차단
+            */
+            if (isFinished || isHolding) return;
+
+            isHolding = true;
+            isCompleted = false;
+
+            clearTimeout(pressTimer);
+
+            showHolding();
+
+            /*
+                3초 유지 성공
+            */
+            pressTimer = setTimeout(() => {
+
+                /*
+                    도중에 손 뗐으면 종료
+                */
+                if (!isHolding) return;
+
+                isCompleted = true;
+
+                /*
+                    완료 잠금
+                */
+                isFinished = true;
+
+                showComplete();
+
+                /*
+                    추가 터치 완전 차단
+                */
+                touchArea.style.pointerEvents = 'none';
+
+            }, 3000);
+        }
+
+        /*
+            터치 종료
+        */
+        function stopHolding(e) {
+
+            e.preventDefault();
+
+            /*
+                완료 상태면 종료
+            */
+            if (isFinished) return;
+
+            isHolding = false;
+
+            clearTimeout(pressTimer);
+
+            /*
+                3초 이전에 손 떼면 초기 상태 복귀
+            */
+            if (!isCompleted) {
+
+                showLoading();
+
+            }
+        }
+
+        /*
+            모바일 앱용 이벤트
+        */
+        touchArea.addEventListener(
+            'touchstart',
+            startHolding,
+            { passive: false }
+        );
+
+        touchArea.addEventListener(
+            'touchend',
+            stopHolding,
+            { passive: false }
+        );
+
+        touchArea.addEventListener(
+            'touchcancel',
+            stopHolding,
+            { passive: false }
+        );
+
+        /*
+            iOS 롱탭 메뉴 방지
+        */
+        touchArea.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+
+    </script>
+
+</body>
+
+</html>
